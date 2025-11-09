@@ -7,10 +7,10 @@
   "frame": {
     "version": "next",
     "name": "Leveraged Legends",
-    "homeUrl": "https://leveragedlegends.com",
+    "homeUrl": "https://app-22277e2b-hygj.vercel.app",
     "iconUrl": "https://leveragedlegends.com/icon.png",
     "splashImageUrl": "https://leveragedlegends.com/splash.png",
     "splashBackgroundColor": "#0A1628",
-    "webhookUrl": "https://leveragedlegends.com/api/farcaster-webhook"
+    "webhookUrl": "https://app-22277e2b-hygj.vercel.app/api/webhook"
   }
 }
