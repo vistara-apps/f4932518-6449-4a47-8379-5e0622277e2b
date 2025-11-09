@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Providers } from "./providers";
+import { Providers } from "./components/Providers";
 
 export const metadata: Metadata = {
-  title: "Leveraged Legends",
+  title: "Leveraged Legends - Master Leveraged Trading",
   description: "Master leveraged trading in a social, simulated sandbox on Base",
   openGraph: {
     title: "Leveraged Legends",
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="base">
       <body>
         <Providers>{children}</Providers>
       </body>

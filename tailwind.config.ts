@@ -9,16 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "var(--color-bg)",
-        fg: "var(--color-fg)",
-        surface: "var(--color-surface)",
-        accent: "var(--color-accent)",
-        primary: "var(--color-primary)",
-        positive: "var(--color-positive)",
-        negative: "var(--color-negative)",
+        bg: 'var(--color-bg)',
+        fg: 'var(--color-fg)',
+        accent: 'var(--color-accent)',
+        surface: 'var(--color-surface)',
+        positive: 'var(--color-positive)',
+        negative: 'var(--color-negative)',
       },
       fontFamily: {
-        mono: ["var(--font-mono)", "monospace"],
+        mono: ['var(--font-mono)', 'monospace'],
       },
     },
   },

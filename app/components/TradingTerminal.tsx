@@ -1,57 +1,78 @@
 'use client';
 
-import { useState } from 'react';
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { PriceChart } from './PriceChart';
+import { OrderForm } from './OrderForm';
+
+interface Asset {
+  symbol: string;
+  name: string;
+  price: number;
+  change24h: number;
+}
+
+const MOCK_ASSETS: Asset[] = [
+  { symbol: 'BTC', name: 'Bitcoin', price: 67659.96, change24h: 2.34 },
+  { symbol: 'ETH', name: 'Ethereum', price: 3456.78, change24h: -1.23 },
+  { symbol: 'SOL', name: 'Solana', price: 145.32, change24h: 5.67 },
+  { symbol: 'BASE', name: 'Base Token', price: 1.23, change24h: 12.45 },
+];
 
 export function TradingTerminal() {
-  const [selectedAsset, setSelectedAsset] = useState('BTC/USD');
-  const [tradeType, setTradeType] = useState<'long' | 'short'>('long');
-  const [leverage, setLeverage] = useState(10);
-  const [amount, setAmount] = useState('');
+  const [selectedAsset, setSelectedAsset] = useState<Asset>(MOCK_ASSETS[0]);
+  const [virtualBalance] = useState(10000);
 
-  const assets = [
-    { symbol: 'BTC/USD', price: 87659.96, change: 2.34, positive: true },
-    { symbol: 'ETH/USD', price: 3245.12, change: -1.23, positive: false },
-    { symbol: 'SOL/USD', price: 178.45, change: 5.67, positive: true },
-  ];
+  // Simulate price updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSelectedAsset(prev => ({
+        ...prev,
+        price: prev.price * (1 + (Math.random() - 0.5) * 0.002),
+      }));
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="p-4 space-y-4">
-      {/* Asset Selector */}
-      <div className="bg-surface rounded-2xl p-4 border border-fg/10">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-fg">Markets</h2>
-          <span className="text-xs text-fg/60 font-mono">Real-time</span>
+    <div className="space-y-6">
+      {/* Virtual Balance Card */}
+      <div className="bg-surface rounded-2xl p-6 border border-white/10">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-fg/60 text-sm">Virtual Balance</span>
+          <DollarSign className="w-5 h-5 text-accent" />
         </div>
-        <div className="space-y-2">
-          {assets.map((asset) => (
+        <div className="text-3xl font-bold text-fg">
+          ${virtualBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        </div>
+        <div className="text-sm text-positive mt-1">+$234.56 (2.35%) Today</div>
+      </div>
+
+      {/* Asset Selector */}
+      <div className="bg-surface rounded-2xl p-4 border border-white/10">
+        <div className="grid grid-cols-2 gap-3">
+          {MOCK_ASSETS.map((asset) => (
             <button
               key={asset.symbol}
-              onClick={() => setSelectedAsset(asset.symbol)}
-              className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
-                selectedAsset === asset.symbol
-                  ? 'bg-accent/10 border border-accent/30'
-                  : 'bg-bg hover:bg-bg/80 border border-transparent'
+              onClick={() => setSelectedAsset(asset)}
+              className={`p-4 rounded-xl border transition-all duration-200 ${
+                selectedAsset.symbol === asset.symbol
+                  ? 'border-accent bg-accent/10'
+                  : 'border-white/10 hover:border-white/20 hover:bg-white/5'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  asset.positive ? 'bg-positive/10' : 'bg-negative/10'
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-fg">{asset.symbol}</span>
+                <span className={`text-xs font-medium ${
+                  asset.change24h >= 0 ? 'text-positive' : 'text-negative'
                 }`}>
-                  {asset.positive ? (
-                    <TrendingUp size={20} className="text-positive" />
-                  ) : (
-                    <TrendingDown size={20} className="text-negative" />
-                  )}
-                </div>
-                <div className="text-left">
-                  <p className="font-bold text-fg">{asset.symbol}</p>
-                  <p className="text-xs text-fg/60 font-mono">${asset.price.toLocaleString()}</p>
-                </div>
+                  {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
+                </span>
               </div>
-              <div className={`text-right ${asset.positive ? 'text-positive' : 'text-negative'}`}>
-                <p className="font-bold">{asset.positive ? '+' : ''}{asset.change}%</p>
+              <div className="text-sm text-fg/60">{asset.name}</div>
+              <div className="text-lg font-bold text-fg mt-1">
+                ${asset.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </div>
             </button>
           ))}
@@ -59,101 +80,32 @@ export function TradingTerminal() {
       </div>
 
       {/* Price Chart */}
-      <PriceChart asset={selectedAsset} />
-
-      {/* Trade Form */}
-      <div className="bg-surface rounded-2xl p-4 border border-fg/10">
-        <h3 className="text-lg font-bold text-fg mb-4">Place Trade</h3>
-        
-        {/* Long/Short Toggle */}
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => setTradeType('long')}
-            className={`flex-1 py-3 rounded-xl font-bold transition-colors ${
-              tradeType === 'long'
-                ? 'bg-positive text-white'
-                : 'bg-bg text-fg/60 hover:bg-bg/80'
-            }`}
-          >
-            <ArrowUpRight size={20} className="inline mr-2" />
-            Long
-          </button>
-          <button
-            onClick={() => setTradeType('short')}
-            className={`flex-1 py-3 rounded-xl font-bold transition-colors ${
-              tradeType === 'short'
-                ? 'bg-negative text-white'
-                : 'bg-bg text-fg/60 hover:bg-bg/80'
-            }`}
-          >
-            <ArrowDownRight size={20} className="inline mr-2" />
-            Short
-          </button>
-        </div>
-
-        {/* Amount Input */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-fg/80 mb-2">Amount (USD)</label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0.00"
-            className="w-full px-4 py-3 rounded-xl bg-bg border border-fg/10 text-fg font-mono text-lg focus:outline-none focus:border-accent transition-colors"
-          />
-        </div>
-
-        {/* Leverage Slider */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-fg/80">Leverage</label>
-            <span className="text-accent font-bold">{leverage}x</span>
-          </div>
-          <input
-            type="range"
-            min="1"
-            max="100"
-            value={leverage}
-            onChange={(e) => setLeverage(Number(e.target.value))}
-            className="w-full h-2 rounded-full appearance-none cursor-pointer"
-            style={{
-              background: `linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) ${leverage}%, rgba(255,255,255,0.1) ${leverage}%, rgba(255,255,255,0.1) 100%)`
-            }}
-          />
-          <div className="flex justify-between text-xs text-fg/60 mt-1">
-            <span>1x</span>
-            <span>50x</span>
-            <span>100x</span>
+      <div className="bg-surface rounded-2xl p-6 border border-white/10">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-xl font-bold text-fg">{selectedAsset.symbol}/USD</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-2xl font-bold text-fg">
+                ${selectedAsset.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </span>
+              <span className={`flex items-center gap-1 text-sm font-medium ${
+                selectedAsset.change24h >= 0 ? 'text-positive' : 'text-negative'
+              }`}>
+                {selectedAsset.change24h >= 0 ? (
+                  <TrendingUp className="w-4 h-4" />
+                ) : (
+                  <TrendingDown className="w-4 h-4" />
+                )}
+                {Math.abs(selectedAsset.change24h).toFixed(2)}%
+              </span>
+            </div>
           </div>
         </div>
-
-        {/* Submit Button */}
-        <button
-          className={`w-full py-4 rounded-xl font-bold text-white transition-colors ${
-            tradeType === 'long'
-              ? 'bg-positive hover:bg-positive/90'
-              : 'bg-negative hover:bg-negative/90'
-          }`}
-        >
-          Open {tradeType === 'long' ? 'Long' : 'Short'} Position
-        </button>
-
-        {/* Trade Info */}
-        <div className="mt-4 p-3 rounded-xl bg-bg border border-fg/10">
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-fg/60">Entry Price</span>
-            <span className="text-fg font-mono">$87,659.96</span>
-          </div>
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-fg/60">Position Size</span>
-            <span className="text-fg font-mono">${amount || '0.00'}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-fg/60">Liquidation Price</span>
-            <span className="text-negative font-mono">$79,193.96</span>
-          </div>
-        </div>
+        <PriceChart asset={selectedAsset} />
       </div>
+
+      {/* Order Form */}
+      <OrderForm asset={selectedAsset} virtualBalance={virtualBalance} />
     </div>
   );
 }
