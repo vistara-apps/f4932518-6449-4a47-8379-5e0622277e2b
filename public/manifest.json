@@ -1,0 +1,14 @@
+{
+  "name": "Leveraged Legends",
+  "description": "Leveraged Legends is a Base Mini App built with Zara.",
+  "image": "https://dummyimage.com/1200x628/0a0b0d/ffffff.png&text=OG",
+  "external_url": "https://f4932518-6449-4a47-8379-5e0622277e2b.vercel.app",
+  "properties": {
+    "app": {
+      "name": "Leveraged Legends",
+      "description": "Leveraged Legends is a Base Mini App built with Zara.",
+      "url": "https://f4932518-6449-4a47-8379-5e0622277e2b.vercel.app",
+      "icon": "https://0co.to/images/zara-2.png"
+    }
+  }
+}
